@@ -9,10 +9,20 @@
             <ul id="userlist">
             </ul>
         </div>
+        <div class="gamelist">
+            <ul id="gamelist">
+            </ul>
+        </div>
         <span id="error" class="error"></span>
     </body>
     <script>
         const token = new URLSearchParams(window.location.search).get('token');
+        let currentGameId = "";
+        let games = new Map();
+
+        function selectUser(username) {
+            console.log(`Selected to play with ${username}`);
+        }
 
         function refreshUsers() {
             $.ajax({
@@ -27,12 +37,40 @@
                     const ul = $("#userlist");
                     ul.empty();
                     for(const user of response.users) {
-                        ul.append($("<li>").text(user));
+                        ul.append(
+                            $("<li>").append(
+                                $("<a>").text(user).click(function () {selectUser(user);})
+                            )
+                        );
+                    }
+                }
+            });
+        }
+
+        function refreshGames() {
+            $.ajax({
+                type: "GET",
+                url: "/games?token=" + token,
+                success: function(response) {
+                    if(response.error) {
+                        $("#error").text(response.error);
+                        return;
+                    }
+                    const ul = $("#gamelist");
+                    ul.empty();
+                    games = new Map(Object.entries(response.games || {}));
+                    for(const game of games.values()) {
+                        ul.append(
+                            $("<li>").append(
+                                $("<a>").text(game.player1 + " vs " + game.player2)
+                            )
+                        );
                     }
                 }
             });
         }
 
         refreshUsers();
+        refreshGames();
     </script>
 </html>
