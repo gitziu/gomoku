@@ -13,6 +13,7 @@ games = {} # Dict: game id -> Game
 gameId = 0
 
 def getGameId():
+    global gameId
     gameId += 1
     return gameId
 
@@ -54,6 +55,8 @@ def getUsers():
 @app.route("/games", methods=["POST"])
 def startGame():
     user = auth()
+    if "username" not in request.form:
+        return error("Nie wiesz z kim grać?")
     player2 = request.form["username"]
     if player2 not in users:
         return error("Nie ma takiego gracza")

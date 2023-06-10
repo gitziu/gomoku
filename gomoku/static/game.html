@@ -9,6 +9,20 @@
             <ul id="userlist">
             </ul>
         </div>
+        <div class="board">
+            <div id="gamename"></div>
+            <table class="board">
+                <script>
+                    for(let row = 0; row < 19; ++row) {
+                        document.write("<tr>");
+                        for(let col = 0; col < 19; ++col) {
+                            document.write("<td id='board-"+ row + "-" + col + "'></td>")
+                        }
+                        document.write("</tr>");
+                    }
+                </script>
+            </table>
+        </div>
         <div class="gamelist">
             <ul id="gamelist">
             </ul>
@@ -18,10 +32,39 @@
     <script>
         const token = new URLSearchParams(window.location.search).get('token');
         let currentGameId = "";
-        let games = new Map();
+        let games = {};
+
+        function refreshBoard(){
+            const game = games[currentGameId];
+            if(!game) {
+                $("#gamename").text("");
+                return;
+            }
+            $("#gamename").text(game.player1 + " vs " + game.player2)
+        }
 
         function selectUser(username) {
             console.log(`Selected to play with ${username}`);
+            $.ajax({
+                type: "POST",
+                url: "/games?token=" + token,
+                data: {username},
+                success: function(response) {
+                    if(response.error) {
+                        $("#error").text(response.error);
+                        return;
+                    }
+                    currentGameId = response.gameId;
+                    listGames(response.games);
+                    refreshBoard();
+                }
+            })
+        }
+
+        function selectGame(id) {
+            console.log(`Selected to see game ${id}`);
+            currentGameId = id;
+            refreshBoard();
         }
 
         function refreshUsers() {
@@ -39,12 +82,25 @@
                     for(const user of response.users) {
                         ul.append(
                             $("<li>").append(
-                                $("<a>").text(user).click(function () {selectUser(user);})
+                                $("<a>").text(user).click(function () {selectUser(user)})
                             )
                         );
                     }
                 }
             });
+        }
+
+        function listGames(gameData) {
+            const ul = $("#gamelist");
+            ul.empty();
+            games = gameData || {};
+            for(const game of Object.values(games)) {
+                        ul.append(
+                            $("<li>").append(
+                                $("<a>").text(game.player1 + " vs " + game.player2).click(function() {selectGame(game.id)})
+                            )
+                        );
+                    }
         }
 
         function refreshGames() {
@@ -56,16 +112,7 @@
                         $("#error").text(response.error);
                         return;
                     }
-                    const ul = $("#gamelist");
-                    ul.empty();
-                    games = new Map(Object.entries(response.games || {}));
-                    for(const game of games.values()) {
-                        ul.append(
-                            $("<li>").append(
-                                $("<a>").text(game.player1 + " vs " + game.player2)
-                            )
-                        );
-                    }
+                    listGames(response.games);
                 }
             });
         }
