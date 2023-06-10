@@ -10,13 +10,16 @@
             </ul>
         </div>
         <div class="board">
-            <div id="gamename"></div>
+            <div>
+                <span id="gamename"></span>
+                <span id="win" class="win"></span>
+            </div>
             <table class="board">
                 <script>
                     for(let row = 0; row < 19; ++row) {
                         document.write("<tr>");
                         for(let col = 0; col < 19; ++col) {
-                            document.write("<td id='board-"+ row + "-" + col + "'></td>")
+                            document.write("<td id='board-" + row + "-" + col + "' onclick='clickCell(" + row + ", " + col + ")'></td>")
                         }
                         document.write("</tr>");
                     }
@@ -34,13 +37,39 @@
         let currentGameId = "";
         let games = {};
 
-        function refreshBoard(){
+        function clickCell(row, col) {
+            console.log(`Clicked on cell (${row}, ${col})`);
+            $.ajax({
+                type: "POST",
+                url: "/move?token=" + token,
+                data: {"token": token, "id": currentGameId, "row": row, "col": col},
+                success: function(response) {
+                    if(response.error) {
+                        $("#error").text(response.error);
+                        return
+                    }
+                    games[currentGameId] = response;
+                    refreshBoard();
+                }
+            })
+        }
+
+        function refreshBoard() {
             const game = games[currentGameId];
             if(!game) {
                 $("#gamename").text("");
                 return;
             }
-            $("#gamename").text(game.player1 + " vs " + game.player2)
+            $("#gamename").text(game.player1 + " vs " + game.player2);
+            if(game["winner"] != "") {
+                $("#win").text("Wygrał: " + game["winner"]);
+            }
+            for(let row = 0; row < 19; row++)  {
+                for(let col = 0; col < 19; col++) {
+                    const value = game.board[row][col];
+                    $("#board-" + row + "-" + col).text(value);
+                }
+            }
         }
 
         function selectUser(username) {
@@ -56,7 +85,6 @@
                     }
                     currentGameId = response.gameId;
                     listGames(response.games);
-                    refreshBoard();
                 }
             })
         }
@@ -101,6 +129,7 @@
                             )
                         );
                     }
+            refreshBoard();
         }
 
         function refreshGames() {
@@ -119,5 +148,7 @@
 
         refreshUsers();
         refreshGames();
+        setInterval(refreshUsers, 2000);
+        setInterval(refreshGames, 1000);
     </script>
 </html>
