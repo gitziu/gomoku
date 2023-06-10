@@ -1,6 +1,7 @@
 <html>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
     <body>
-        <form method="POST" action="/login">
+        <form id="loginform">
             <div>
                 <div>
                     Zaloguj się:
@@ -8,7 +9,26 @@
                 <div>
                     <input type="text" name="username">
                 </div>
+                <div id="error"></div>
             </div>
         </form>
     </body>
+    <script>
+        $("#loginform").submit(function(e) {
+            e.preventDefault();
+            const form = $(this);
+            $.ajax({
+                type: "POST",
+                url: "/login",
+                data: form.serialize(),
+                success: function(response) {
+                    if(response.error) {
+                        $("#error").html(response.error);
+                    } else {
+                        window.location.assign("/game.html?token=" + response.token);
+                    }
+                }
+            });
+        });
+    </script>
 </html>

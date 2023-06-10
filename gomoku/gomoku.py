@@ -13,7 +13,7 @@ def main():
 @app.route("/login", methods=["POST"])
 def login():
     if "username" not in request.form:
-        abort(401)
+        return jsonify({"error": "Nie podano loginu"})
     username = request.form["username"]
     if username in users:
         return jsonify({"error": "Taki login jest już używany"})
