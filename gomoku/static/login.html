@@ -1,5 +1,8 @@
 <html>
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <head>
+        <link rel="stylesheet" href="/static/style.css">
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    </head>
     <body>
         <form id="loginform">
             <div>
@@ -9,7 +12,7 @@
                 <div>
                     <input type="text" name="username">
                 </div>
-                <div id="error"></div>
+                <div id="error" class="error"></div>
             </div>
         </form>
     </body>
@@ -23,9 +26,9 @@
                 data: form.serialize(),
                 success: function(response) {
                     if(response.error) {
-                        $("#error").html(response.error);
+                        $("#error").text(response.error);
                     } else {
-                        window.location.assign("/game.html?token=" + response.token);
+                        window.location.assign("/static/game.html?token=" + response.token);
                     }
                 }
             });

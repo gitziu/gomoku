@@ -1,0 +1,38 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/style.css">
+        <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div class="userlist">
+            Hello <span id="username" class="you"></span>.
+            <ul id="userlist">
+            </ul>
+        </div>
+        <span id="error" class="error"></span>
+    </body>
+    <script>
+        const token = new URLSearchParams(window.location.search).get('token');
+
+        function refreshUsers() {
+            $.ajax({
+                type: "GET",
+                url: "/users?token=" + token,
+                success: function(response) {
+                    if(response.error) {
+                        $("#error").text(response.error);
+                        return;
+                    }
+                    $("#username").text(response.you);
+                    const ul = $("#userlist");
+                    ul.empty();
+                    for(const user of response.users) {
+                        ul.append($("<li>").text(user));
+                    }
+                }
+            });
+        }
+
+        refreshUsers();
+    </script>
+</html>
