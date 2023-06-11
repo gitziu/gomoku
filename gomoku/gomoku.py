@@ -35,7 +35,7 @@ def main():
 
 @app.route("/login", methods=["POST"])
 def login():
-    if "username" not in request.form:
+    if "username" not in request.form or request.form["username"] == "":
         return error("Nie podano loginu")
     username = request.form["username"]
     if username in users:

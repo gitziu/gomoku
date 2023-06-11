@@ -15,7 +15,7 @@
                 <div>
                     <button class="button">zaloguj się</button>
                 </div>
-                <div id="error" class="error"></div>
+                <div class="error"><span id="error"></span>&nbsp;</div>
                 </form>
             </div>
     </body>
@@ -30,11 +30,17 @@
                 success: function(response) {
                     if(response.error) {
                         $("#error").text(response.error);
+                        setTimeout(fade, 3000);
                     } else {
                         window.location.assign("/static/game.html?token=" + response.token);
                     }
                 }
             });
         });
+
+        function fade() {
+            $("#error").empty();
+        }
+        
     </script>
 </html>

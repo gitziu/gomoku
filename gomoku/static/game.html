@@ -9,8 +9,13 @@
             <ul id="userlist">
             </ul>
         </div>
+        <div class="gamelist">
+            <ul id="gamelist">
+            </ul>
+        </div>
         <div class="board">
             <div>
+                &nbsp;
                 <span id="gamename"></span>
                 <span id="win" class="win"></span>
             </div>
@@ -25,12 +30,8 @@
                     }
                 </script>
             </table>
+            <span id="error" class="error"></span>
         </div>
-        <div class="gamelist">
-            <ul id="gamelist">
-            </ul>
-        </div>
-        <span id="error" class="error"></span>
     </body>
     <script>
         const token = new URLSearchParams(window.location.search).get('token');
@@ -46,6 +47,7 @@
                 success: function(response) {
                     if(response.error) {
                         $("#error").text(response.error);
+                        setTimeout(fade, 3000);
                         return
                     }
                     games[currentGameId] = response;
@@ -81,6 +83,7 @@
                 success: function(response) {
                     if(response.error) {
                         $("#error").text(response.error);
+                        setTimeout(fade, 3000);
                         return;
                     }
                     currentGameId = response.gameId;
@@ -102,6 +105,7 @@
                 success: function(response) {
                     if(response.error) {
                         $("#error").text(response.error);
+                        setTimeout(fade, 3000);
                         return;
                     }
                     $("#username").text(response.you);
@@ -110,7 +114,9 @@
                     for(const user of response.users) {
                         ul.append(
                             $("<li>").append(
-                                $("<a>").text(user).click(function () {selectUser(user)})
+                                $("<a>").append(
+                                    $("<img>").attr("src", "https://robohash.org/" + user + "?sets=set1,set4"))
+                                    .append($("<span>").text(user)).click(function () {selectUser(user)})
                             )
                         );
                     }
@@ -125,8 +131,10 @@
             for(const game of Object.values(games)) {
                         ul.append(
                             $("<li>").append(
-                                $("<a>").text(game.player1 + " vs " + game.player2).click(function() {selectGame(game.id)})
-                            )
+                                $("<a>").append(
+                                $("<img>").attr("src", "https://robohash.org/" + game.player1 + "?sets=set1,set4")
+                                ).append($("<span>").text(game.player1 + " vs " + game.player2).click(function() {selectGame(game.id)})
+                            ).append($("<img>").attr("src", "https://robohash.org/" + game.player2 + "?sets=set1,set4")))
                         );
                     }
             refreshBoard();
@@ -139,11 +147,16 @@
                 success: function(response) {
                     if(response.error) {
                         $("#error").text(response.error);
+                        setTimeout(fade, 3000);
                         return;
                     }
                     listGames(response.games);
                 }
             });
+        }
+
+        function fade() {
+            $("#error").empty();
         }
 
         refreshUsers();
