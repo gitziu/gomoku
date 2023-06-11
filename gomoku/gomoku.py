@@ -127,7 +127,7 @@ def testData():
     for user in testUsers:
         users[user["username"]] = user
         tokens[user["token"]] = user
-    testGames = [{"id": "1000", "player1": "tata", "player2": "Pawłek", "next": "X", "winner": "", "board": createBoard()}]
+    testGames = [{"id": "1000", "player1": "tata", "player2": "Pawełek", "next": "X", "winner": "", "board": createBoard()}]
     testGames[0]["board"][3][7]="X"
     testGames[0]["board"][4][6]="O"
     for game in testGames:

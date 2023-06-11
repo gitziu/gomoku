@@ -108,16 +108,13 @@
                         setTimeout(fade, 3000);
                         return;
                     }
-                    $("#username").text(response.you);
+                    $("#username").empty();
+                    addAvatar($("#username"), response.you, true);
                     const ul = $("#userlist");
                     ul.empty();
                     for(const user of response.users) {
                         ul.append(
-                            $("<li>").append(
-                                $("<a>").append(
-                                    $("<img>").attr("src", "https://robohash.org/" + user + "?sets=set1,set4"))
-                                    .append($("<span>").text(user)).click(function () {selectUser(user)})
-                            )
+                            addAvatar($("<li>"), user, true).click(function () {selectUser(user)})
                         );
                     }
                 }
@@ -129,14 +126,14 @@
             ul.empty();
             games = gameData || {};
             for(const game of Object.values(games)) {
-                        ul.append(
-                            $("<li>").append(
-                                $("<a>").append(
-                                $("<img>").attr("src", "https://robohash.org/" + game.player1 + "?sets=set1,set4")
-                                ).append($("<span>").text(game.player1 + " vs " + game.player2).click(function() {selectGame(game.id)})
-                            ).append($("<img>").attr("src", "https://robohash.org/" + game.player2 + "?sets=set1,set4")))
-                        );
-                    }
+                const link = $("<a>");
+                const listItem = $("<li>");
+                addAvatar(link, game.player1, true);
+                link.append(" vs ");
+                addAvatar(link, game.player2, false);
+                listItem.click(function() {selectGame(game.id)});
+                ul.append(listItem.append(link));
+            }
             refreshBoard();
         }
 
@@ -157,6 +154,17 @@
 
         function fade() {
             $("#error").empty();
+        }
+
+        function addAvatar(el, user, left) {
+            if (!left) {
+                el.append($("<span>").text(user));
+            }
+            el.append($("<img>").attr("src", "https://robohash.org/" + encodeURIComponent(user) + "?sets=set1,set4"));
+            if (left) {
+                el.append($("<span>").text(user));
+            }
+            return el;
         }
 
         refreshUsers();
